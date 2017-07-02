@@ -1,0 +1,694 @@
+{%extends 'smsapp/base.html'%}
+{%load staticfiles%}
+
+  {%block content%}
+                      <!-- DASHBOARD PANE CODE in sms_system__dashboard.html -->
+              
+              <div class="tab-pane fade in active" id="add_students_pane">
+                      <div class="row heading">
+                          <div class="col-lg-12">
+                              <h2 class="page-header">Add Student Details</h2>
+                          </div>      <!-- /.col-lg-12 -->
+                      </div>          <!-- /.row -->
+                      
+                      <div class="add_student_container">
+                      
+                          <form class="well_white form-horizontal" action="{% url 'dashboard'%}" method="post"  id="contact_form">
+                              {% csrf_token %}
+
+                              <!-- Success Message -->
+                              {% if success %}
+                                  <div class="form-group inputdata">
+                                      <label class="col-md-4 control-label"></label>  
+                                      <div class="col-md-4 inputGroupContainer"> 
+                                              <div class="alert alert-success alert-dismissable fade in">
+                                                  <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>{{success}}
+                                              </div>
+                                      </div>
+                                  </div>
+                              {% endif %}
+                              {% if edit_success %}
+                                  <div class="form-group inputdata">
+                                      <label class="col-md-4 control-label"></label>  
+                                      <div class="col-md-4 inputGroupContainer"> 
+                                              <div class="alert alert-success alert-dismissable fade in">
+                                                  <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>{{edit_success}}
+                                              </div>
+                                      </div>
+                                  </div>
+                              {% endif %}
+
+
+
+                                <!-- Text input for first Name-->
+
+                                <div class="form-group inputdata">
+                                  <label class="col-md-4 control-label">First Name</label>  
+                                  <div class="col-md-4 inputGroupContainer">
+                                      <div class="input-group">
+                                          <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                                          <input  name="first_name" class="form-control"  type="text">
+                                      </div>
+                                  </div>
+                                </div>
+
+
+                                <!-- Text input for last name-->
+
+                                <div class="form-group inputdata">
+                                  <label class="col-md-4 control-label" >Last Name</label> 
+                                    <div class="col-md-4 inputGroupContainer">
+                                    <div class="input-group">
+                                      <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                                      <input name="last_name" class="form-control"  type="text">
+                                    </div>
+                                  </div>
+                                </div>
+
+
+                                <!-- Text input for parentage-->
+
+                                <div class="form-group inputdata">
+                                  <label class="col-md-4 control-label" >Parentage</label> 
+                                    <div class="col-md-4 inputGroupContainer">
+                                    <div class="input-group">
+                                  <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                                  <input name="parentage" class="form-control"  type="text">
+                                    </div>
+                                  </div>
+                                </div>
+
+
+                                <!-- Text input for email-->
+                                <div class="form-group inputdata">
+                                  <label class="col-md-4 control-label">Email ID</label>  
+                                    <div class="col-md-4 inputGroupContainer">
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span>
+                                  <input name="email" class="form-control"  type="text">
+                                    </div>
+                                  </div>
+                                </div>
+
+
+                                <!-- Text input for contact number-->
+                                       
+                                <div class="form-group inputdata">
+                                  <label class="col-md-4 control-label">Contact Number</label>  
+                                    <div class="col-md-4 inputGroupContainer">
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><i class="glyphicon glyphicon-earphone"></i></span>
+                                  <input name="phone" class="form-control" type="text">
+                                    </div>
+                                  </div>
+                                </div>
+
+
+
+                                <!-- radio checks -->
+                                 <div class="form-group inputdata">
+                                      <label class="col-md-4 control-label">Gender:</label>
+                                      <div class="col-md-4">
+                                          <span class="radio gap">
+                                              <label class="radio-inline">
+                                                  <input type="radio" name="gender" value="M" /> Male
+                                              </label>
+                                          </span>
+                                          
+
+                                          <span class="radio gap">
+                                              <label class="radio-inline">
+                                                  <input type="radio" name="gender" value="F" /> Female
+                                              </label>
+                                          </span>
+                                      </div>
+                                  </div>
+
+
+
+
+                                <!-- Text input for address-->
+                                      
+                                <div class="form-group inputdata">
+                                  <label class="col-md-4 control-label">Address</label>  
+                                    <div class="col-md-4 inputGroupContainer">
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span>
+                                  <input name="address" class="form-control" type="text">
+                                    </div>
+                                  </div>
+                                </div>
+
+
+                                <!-- Text input for Pincode -->
+
+                                <div class="form-group inputdata">
+                                  <label class="col-md-4 control-label">Pin Code</label>  
+                                    <div class="col-md-4 inputGroupContainer">
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><i class="glyphicon glyphicon-pushpin"></i></span>
+                                  <input name="zip" class="form-control"  type="text">
+                                    </div>
+                                </div>
+                                </div>
+
+
+                                <!-- Select Basic for Class-->
+                                   
+                                <div class="form-group inputdata"> 
+                                  <label class="col-md-4 control-label">Class</label>
+                                    <div class="col-md-4 selectContainer">
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><i class="glyphicon glyphicon-copyright-mark"></i></span>
+                                    <select name="class" class="form-control selectpicker" >
+                                      <option value=" " >Please select the Class</option>
+                                      <option>12th</option>
+                                      <option>11th</option>
+                                      <option>10th</option>
+                                      <option>9th</option>
+                                      <option>8th</option>
+                                      <option>7th</option>
+                                      <option>6th</option>
+                                      <option>5th</option>
+                                      <option>4th</option>
+                                      <option>3rd</option>
+                                      <option>2nd</option>
+                                      <option>1st</option>
+                                      <option>UKG</option>
+                                      <option>LKG</option>
+                                      <option>Nursery</option>
+                                    </select>
+                                  </div>
+                                </div>
+                                </div>
+
+
+                                <!-- Select Basic for section-->
+                                   
+                                <div class="form-group inputdata"> 
+                                  <label class="col-md-4 control-label">Section</label>
+                                    <div class="col-md-4 selectContainer">
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><i class="glyphicon glyphicon-console"></i></span>
+                                    <select name="section" class="form-control selectpicker" >
+                                      <option value=" " >Please select the section</option>
+                                      <option >A</option>
+                                      <option >B</option>
+                                      <option >C</option>
+                                      <option >D</option>
+                                    </select>
+                                  </div>
+                                </div>
+                                </div>
+
+
+                                 <!-- Text input for Roll no.-->
+                                 
+                                <div class="form-group inputdata">
+                                  <label class="col-md-4 control-label">Roll No</label>  
+                                    <div class="col-md-4 inputGroupContainer">
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><i class="glyphicon glyphicon-registration-mark"></i></span>
+                                  <input name="roll_no" class="form-control"  type="text">
+                                    </div>
+                                  </div>
+                                </div>
+
+
+
+
+                                <!-- Success message -->
+                                <div class="alert alert-success" role="alert" id="success_message">Success <i class="glyphicon glyphicon-thumbs-up"></i> Thanks for contacting us, we will get back to you shortly.</div>
+
+                                <!-- Button -->
+                                <div class="form-group inputdata">
+                                  <label class="col-md-4 control-label"></label>
+                                  <div class="col-md-4">
+                                    <button type="submit" class="btn btn-primary" id="button" name="add_student_button"><span class="glyphicon glyphicon-send"></span> Add Student Details </button>
+                                  </div>
+                                </div>
+                          </form>
+                      </div><!-- /.add_student_container -->
+              </div>
+
+              <div class="tab-pane fade" id="edit_students_pane">
+                    <div class="row heading">
+                        <div class="col-lg-12">
+                            <h2 class="page-header">Edit Student Details</h2>
+                        </div>      <!-- /.col-lg-12 -->
+                        
+                    </div>          <!-- /.row -->
+                        
+                    <div class="edit_student_container">
+                                       
+                          <form method="get" action="{% url 'dashboard' %}" id="show_student_list">
+                          
+                              <div class="row" >
+                                    <div class="col-md-4">
+                                    </div>
+
+                                    <div class="col-md-4 selectContainer" style="margin-bottom: 30px";>
+                                        <div class="input-group">
+                                          <span class="input-group-addon"><i class="glyphicon glyphicon-list"></i></span>
+                                          <select name="student_id" class="form-control selectpicker" >
+                                            <option value="" >Student ID</option>
+                                            {%for student in student_list%}
+                                              <option>{{student.id}}</option>
+                                            {%endfor%}                                            
+                                          </select>
+                                          <span class="input-group-btn"><button type="submit" name="student_list" class="btn btn-default">Show Data</button></span>
+                                        </div>
+                                    </div>
+
+                                    <!-- <div class="col-md-4" style="margin-bottom: 30px">
+                                        <div class="input-group">
+                                            <button type="submit" name="student_list" class="btn btn-primary"> Show Student Detail</button>
+                                        </div>
+                                    </div> -->
+                              </div>
+                          </form>
+                        
+                          <form class="well_white form-horizontal" action="{%url 'dashboard'%}" method="post"  id="edit_contact_form">
+                            {% csrf_token %}
+                            
+                            {% if show%}
+                              <input type="text" name="hidden_id" value="{{student.id}}" hidden>
+
+                                  <!-- Text edit for first Name-->
+
+                                  <div class="form-group inputdata">
+                                    <label class="col-md-4 control-label">First Name</label>  
+                                    <div class="col-md-4 inputGroupContainer">
+                                    <div class="input-group">
+                                    <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                                    <input  name="edit_first_name" class="form-control"  type="text" value="{{student.first_name}}">
+                                    </div>
+
+                                    </div>
+                                  </div>
+
+
+                                  <!-- Text edit for last name-->
+
+                                  <div class="form-group inputdata">
+                                    <label class="col-md-4 control-label" >Last Name</label> 
+                                      <div class="col-md-4 inputGroupContainer">
+                                      <div class="input-group">
+                                    <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                                    <input name="edit_last_name" class="form-control"  type="text" value="{{student.last_name}}">
+                                      </div>
+                                    </div>
+                                  </div>
+
+
+                                  <!-- Text edit for parentage-->
+
+                                  <div class="form-group inputdata">
+                                    <label class="col-md-4 control-label" >Parentage</label> 
+                                      <div class="col-md-4 inputGroupContainer">
+                                      <div class="input-group">
+                                    <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                                    <input name="edit_parentage" class="form-control"  type="text" value="{{student.parentage}}">
+                                      </div>
+                                    </div>
+                                  </div>
+
+
+                                  <!-- Text edit for email-->
+                                  <div class="form-group inputdata">
+                                    <label class="col-md-4 control-label">Email ID</label>  
+                                      <div class="col-md-4 inputGroupContainer">
+                                      <div class="input-group">
+                                          <span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span>
+                                    <input name="edit_email" class="form-control"  type="text" value="{{student.email}}">
+                                      </div>
+                                    </div>
+                                  </div>
+
+
+                                  <!-- Text edit for contact number-->
+                                         
+                                  <div class="form-group inputdata">
+                                    <label class="col-md-4 control-label">Contact Number</label>  
+                                      <div class="col-md-4 inputGroupContainer">
+                                      <div class="input-group">
+                                          <span class="input-group-addon"><i class="glyphicon glyphicon-earphone"></i></span>
+                                        <input name="edit_phone" class="form-control" type="text" value={{student.contact}}>
+                                      </div>
+                                    </div>
+                                  </div>
+
+
+
+                                  <!-- radio checks -->
+                                   <div class="form-group inputdata">
+                                        <label class="col-md-4 control-label">Gender:</label>
+                                        <div class="col-md-4">
+                                        
+                                                <label class="radio-inline">
+                                                  <input type="radio" name="edit_gender" {%if "M" in student.gender %} checked {%endif%} />Male
+                                                </label>
+                                            
+                                                <label class="radio-inline">
+                                                    <input type="radio" name="edit_gender"{%if "F" in student.gender %} checked {%endif%} />Female
+                                                </label>
+                                            
+                                        
+                                        </div>
+                                    </div>
+
+
+
+                                  <!-- Text edit for address-->
+                                        
+                                  <div class="form-group inputdata">
+                                    <label class="col-md-4 control-label">Address</label>  
+                                      <div class="col-md-4 inputGroupContainer">
+                                      <div class="input-group">
+                                          <span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span>
+                                    <input name="edit_address" class="form-control" type="text" value="{{student.address}}">
+                                      </div>
+                                    </div>
+                                  </div>
+
+
+                                  <!-- Text edit for Pincode -->
+
+                                  <div class="form-group inputdata">
+                                    <label class="col-md-4 control-label">Pin Code</label>  
+                                      <div class="col-md-4 inputGroupContainer">
+                                      <div class="input-group">
+                                          <span class="input-group-addon"><i class="glyphicon glyphicon-pushpin"></i></span>
+                                    <input name="edit_zip" class="form-control"  type="text" value={{student.pincode}}>
+                                      </div>
+                                  </div>
+                                  </div>
+
+
+                                  <!-- Select Basic for Class-->
+                                     
+                                  <div class="form-group inputdata"> 
+                                    <label class="col-md-4 control-label">Class</label>
+                                      <div class="col-md-4 selectContainer">
+                                      <div class="input-group">
+                                          <span class="input-group-addon"><i class="glyphicon glyphicon-copyright-mark"></i></span>
+                                      <select name="edit_class" class="form-control selectpicker" >
+                                      <optgroup>
+                                        <option>{{student.classes}}</option>
+                                      </optgroup>
+                                      <optgroup label= ------------------------------------------------------->
+                                          <option>12th</option>
+                                          <option>11th</option>
+                                          <option>10th</option>
+                                          <option>9th</option>
+                                          <option>8th</option>
+                                          <option>7th</option>
+                                          <option>6th</option>
+                                          <option>5th</option>
+                                          <option>4th</option>
+                                          <option>3rd</option>
+                                          <option>2nd</option>
+                                          <option>1st</option>
+                                          <option>UKG</option>
+                                          <option>LKG</option>
+                                          <option>Nursery</option>
+                                      </optgroup>
+                                      </select>
+                                    </div>
+                                  </div>
+                                  </div>
+
+
+                                  <!-- Select Basic for section-->
+                                     
+                                  <div class="form-group inputdata"> 
+                                    <label class="col-md-4 control-label">Section</label>
+                                      <div class="col-md-4 selectContainer">
+                                      <div class="input-group">
+                                          <span class="input-group-addon"><i class="glyphicon glyphicon-console"></i></span>
+                                      <select name="edit_section" class="form-control selectpicker" >
+                                        <optgroup>
+                                          <option>{{student.section}}</option>
+                                        </optgroup>
+                                        <optgroup label= ------------------------------------------------------->
+                                          <option>A</option>
+                                          <option>B</option>
+                                          <option>C</option>
+                                          <option>D</option>
+                                        </optgroup>
+                                      </select>
+                                    </div>
+                                  </div>
+                                  </div>
+
+
+                                   <!-- Text edit for Roll no.-->
+                                   
+                                  <div class="form-group inputdata">
+                                    <label class="col-md-4 control-label">Roll No</label>  
+                                      <div class="col-md-4 inputGroupContainer">
+                                      <div class="input-group">
+                                          <span class="input-group-addon"><i class="glyphicon glyphicon-registration-mark"></i></span>
+                                    <input name="edit_roll_no" class="form-control"  type="text" value={{student.roll_no}}>
+                                      </div>
+                                    </div>
+                                  </div>
+
+
+
+
+                                  <!-- Success message -->
+                                  <div class="alert alert-success" role="alert" id="success_message">Success <i class="glyphicon glyphicon-thumbs-up"></i> Thanks for contacting us, we will get back to you shortly.</div>
+
+                                  <!-- Button -->
+                                  <div class="form-group inputdata">
+                                    <label class="col-md-4 control-label"></label>
+                                    <div class="col-md-4">
+                                      <button type="submit" class="btn btn-primary" id="button" name="edit_student_button"><span class="glyphicon glyphicon-pencil"></span> Edit Student Details </button>
+                                    </div>
+                                  </div>
+                            {%endif%}
+                          </form>
+                        
+                    </div><!-- /.Edit_student_container -->
+              </div>
+
+
+              <div class="modal fade" id="bulk_upload_pane" role="dialog">
+                            <div class="modal-dialog modal-offset-top">
+
+                              <!-- Modal content-->
+                              <div class="modal-content" >
+                                <div class="modal-header" >
+                                  <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                  <h4 class="modal-title">Upload File</h4>
+                                </div>  <!--Modal Header-->
+
+                                <div class="modal-body">
+                                  <form action="#" method="POST" class="form-horizontal">
+                                      {%csrf_token%}
+                                      <label for= "filebox">Choose File:</label>
+                                      <input  id="filebox" name="bulk_upload_file" type="file"  class="form-controls filestyle" data-buttonBefore="true"  data-buttonText="Choose File" data-placeholder="No File">
+
+                                      <div class="btndiv">
+                                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                                        <button type="submit" id="btnupload" class="btn btn-success pull-right" > Upload</button>
+                                      </div>
+
+                                  </form>
+                                </div>  <!--Modal Body-->
+
+                                <div class="modal-footer" >
+                                </div>  <!--Modal Footer-->
+                              </div>  <!--Modal Content-->
+
+                            </div>    <!--Modal Dialog-->
+              </div>    <!--Upload Modal-->
+
+
+              <div class="tab-pane fade" id="send_sms_pane">
+                  <div class="row">
+                      <div class="col-lg-12">
+                          <h2 class="page-header">Send SMS</h2>
+                      </div>      <!-- /.col-lg-12 -->
+                  </div>
+
+                  <div class="form-group inputdata" style="margin-bottom: 50px;"> 
+
+                      <div class="col-sm-3 col-xs-6 selectContainer" style="margin-bottom: 30px">
+                          <div class="input-group">
+                              <select name="class" class="form-control selectpicker" style="border-radius: 4px;" >
+                                <option value=" " > Select Class</option>
+                                <option>12th</option>
+                                <option>11th</option>
+                                <option>10th</option>
+                                <option>9th</option>
+                                <option>8th</option>
+                                <option>7th</option>
+                                <option>6th</option>
+                                <option>5th</option>
+                                <option>4th</option>
+                                <option>3rd</option>
+                                <option>2nd</option>
+                                <option>1st</option>
+                                <option>UKG</option>
+                                <option>LKG</option>
+                                <option>Nursery</option>
+                              </select>
+                          </div>
+                      </div>
+
+                      <div class="col-sm-3 col-xs-6 selectContainer" style="margin-bottom: 30px">
+                          <div class="input-group">
+                              <select name="class" class="form-control selectpicker" style="border-radius: 4px;" >
+                                <option value=" " >Select Section</option>
+                                <option>A</option>
+                                <option>B</option>
+                                <option>C</option>
+                                <option>D</option>
+                              </select>
+                          </div>
+                      </div>
+
+                      <div class="col-sm-3 col-xs-6 selectContainer" style="margin-bottom: 30px">
+                          <div class="input-group">
+                              <select name="class" class="form-control selectpicker" style="border-radius: 4px;">
+                                <option value=" " >Select Roll No</option>
+                                <option>1</option>
+                                <option>2</option>
+                                <option>3</option>
+                                <option>4</option>
+                                <option>5</option>
+                                <option>6</option>
+                                <option>7</option>
+                                <option>8</option>
+                                <option>9</option>
+                                <option>10</option>
+                                <option>11</option>
+                                <option>12</option>
+                                <option>13</option>
+                                <option>14</option>
+                                <option>15</option>
+                              </select>
+                          </div>
+                      </div>
+
+                      <div class="col-sm-3 col-xs-6 selectContainer" style="margin-bottom: 30px">
+                          <div class="input-group">
+                              <button type="button" name="student_list" class="btn btn-success"> Show Student List</span></button>
+                          </div>
+                      </div>
+                  
+                  </div>
+
+                    <table border="0" cellpadding='8' cellspacing='10' class="table table-striped table-responsive">
+                                  <tr>
+                                      <td align="right" colspan="10"><a href="#" data-toggle="modal" data-target="#compose_modal" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-pencil"> Compose</a></td>
+                                  </tr>
+                                 
+                                  <tr>
+                                      <th>First Name</th>
+                                      <th>Last Name</th>
+                                      <th>Parentage</th>
+                                      <th>Email</th>
+                                      <th>Contact No</th>
+                                      <th>Gender</th>
+                                      <th>Class</th>
+                                      <th>Section</th>
+                                      <th>Roll No.</th>     
+                                  </tr>
+                                  
+                                  <tr>
+                                      <td>Mir Umer</td>
+                                      <td>Shafi</td>
+                                      <td>Mohammad Shafi Mir</td>
+                                      <td>mirumershafi@gmail.com</td>
+                                      <td>9596062959</td>
+                                      <td>Male</td>
+                                      <td>12th</td>
+                                      <td>A</td>
+                                      <td>2317</td>
+                                      <td><a href="#" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-remove"></span></a></td>
+                                  </tr>
+                                  <tr>
+                                      <td>Khalid</td>
+                                      <td>Majeed</td>
+                                      <td>Abdul Majeed</td>
+                                      <td>khalidyaseen5@gmail.com</td>
+                                      <td>9858450373</td>
+                                      <td>Male</td>
+                                      <td>10th</td>
+                                      <td>D</td>
+                                      <td>2339</td>
+                                      <td><a href="#" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-remove"></span></a></td>
+                                  </tr>
+                                  <tr>
+                                      <td>Aadil Rashid</td>
+                                      <td>Bhat</td>
+                                      <td>Abdul Rashid Bhat</td>
+                                      <td>aadilrasheedbhat@gmail.com</td>
+                                      <td>7298032237</td>
+                                      <td>Male</td>
+                                      <td>8th</td>
+                                      <td>B</td>
+                                      <td>2303</td>
+                                      <td><a href="#" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-remove"></span></a></td>
+                                  </tr>
+                                  <tr>
+                                      <td>Asra Shafi</td>
+                                      <td>Mir</td>
+                                      <td>Mohammad Shafi Mir</td>
+                                      <td>mirasra@gmail.com</td>
+                                      <td>7006492650</td>
+                                      <td>Female</td>
+                                      <td>10th</td>
+                                      <td>C</td>
+                                      <td>2330</td>
+                                      <td><a href="#" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-remove"></span></a></td>
+                                  </tr>
+                    </table>
+              </div>
+
+
+              <div class="modal fade" id="compose_modal" role="dialog">
+                            <div class="modal-dialog modal-offset-top">
+
+                              <!-- Modal content-->
+                              <div class="modal-content" >
+                                <div class="modal-header" >
+                                  <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                  <h4 class="modal-title">Compose SMS</h4>
+                                </div>  <!--Modal Header-->
+
+                                <div class="modal-body">
+                                  <form action="#" method="POST" class="form-horizontal">
+                                      {%csrf_token%}
+                                      <!-- <label for= "reciever">To:</label>
+                                      <input  id="reciever" name="sms_reciever" type="text"  class="form-controls">
+                                      <br> -->
+
+                                      <label for= "message">Message:</label>
+                                      <!-- <input  id="message" name="sms_message" type="textarea"  class="form-controls"> -->
+                                      <textarea rows="8" cols="53" id="message" class="form-control" style="text-align: left;resize: none; font-size: 16px;"></textarea>
+
+
+                                      <div class="btndiv">
+                                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                                        <button type="submit" id="btnsend" class="btn btn-success pull-right" >Send</button>
+                                      </div>
+
+                                  </form>
+                                </div>  <!--Modal Body-->
+
+                                <div class="modal-footer" >
+                                </div>  <!--Modal Footer-->
+                              </div>  <!--Modal Content-->
+
+                            </div>    <!--Modal Dialog-->
+              </div>    <!--Compose SMS Modal-->
+        
+  {%endblock%}
+
+
+
+   
