@@ -94,11 +94,11 @@
                                     </li> 
                             -->
 
-                            <li>
+                            <li href="{% url 'dashboard' %}">
                                 <a data-toggle="tab" href="#add_students_pane"><i class="fa fa-user fa-fw"></i> Add Student Details</a>
                             </li>
 
-                            <li>
+                            <li href="{% url 'dashboard' %}">
                                 <a data-toggle="tab" href="#edit_students_pane"><i class="fa fa-edit fa-fw"></i> Edit Student Details</a>
                             </li>
 
@@ -116,7 +116,7 @@
                 <!-- /.navbar-static-side -->
             </nav>
             <div id="wrapper">
-                <div id="page-wrapper" class="tab-content">
+                <div id="page-wrapper" class="tab-content" style="background-image: url('/home/mirumer/Desktop/school.jpg')">
                     {%block content%}
                         
                     {%endblock%}
