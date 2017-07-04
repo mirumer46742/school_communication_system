@@ -1,4 +1,5 @@
-  $(document).ready(function(){
+$(document).ready(function(){
+
 
     $('#contact_form').bootstrapValidator({
         // To use feedback icons, ensure that you use Bootstrap v3.1.0 or later
@@ -18,9 +19,9 @@
                     }
                 }
             },
-             last_name: {
+            last_name: {
                 validators: {
-                     stringLength: {
+                    stringLength: {
                         min: 2,
                     },
                     notEmpty: {
@@ -135,13 +136,13 @@
                     notEmpty: {
                         message: 'Please provide a description of your project'
                     }
-                    }
                 }
             }
-        })
-});  
+        }
+    });
+  
 
-  $('#edit_contact_form').bootstrapValidator({
+    $('#edit_contact_form').bootstrapValidator({
         // To use feedback icons, ensure that you use Bootstrap v3.1.0 or later
         feedbackIcons: {
             valid: 'glyphicon glyphicon-ok',
@@ -159,7 +160,7 @@
                     }
                 }
             },
-             edit_last_name: {
+            edit_last_name: {
                 validators: {
                      stringLength: {
                         min: 2,
@@ -276,7 +277,21 @@
                     notEmpty: {
                         message: 'Please provide a description of your project'
                     }
-                    }
                 }
             }
-        });
+        }
+    });
+
+   /* $('#select_all_checkbox').click(function() {
+        $(this.table.elements).filter(':checkbox').attr('checked', this.checked);
+    });
+*/
+    $('#select_all_checkbox').click(function() {
+    if ($(this).is(':checked')) {
+        $('td input').attr('checked', true);
+    } else {
+        $('td input').attr('checked', false);
+    }
+    });
+
+});

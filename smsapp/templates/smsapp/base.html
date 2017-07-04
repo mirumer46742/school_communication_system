@@ -58,13 +58,13 @@
 
                     <li class="dropdown">
                         <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                            <i class="fa fa-user fa-fw"></i> Mir Umer <i class="fa fa-caret-down"></i>
+                            <i class="fa fa-user fa-fw"></i> {{user.username}} <i class="fa fa-caret-down"></i>
                         </a>
                         <ul class="dropdown-menu dropdown-user">
-                            <li><a href="#"><i class="fa fa-user fa-fw"></i> User Profile</a>
+                            <!-- <li><a href="#"><i class="fa fa-user fa-fw"></i> User Profile</a>
                             </li>
                             <li><a href="#"><i class="fa fa-gear fa-fw"></i> Settings</a>
-                            </li>
+                            </li> -->
                             <li class="divider"></li>
                             <li><a href="{% url 'logout' %}"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
                             </li>
@@ -76,7 +76,7 @@
                     <div class="sidebar-nav navbar-collapse">
                         <ul class="nav" id="side-menu" role="tablist">
 
-                            <li class="sidebar-search">
+                            <li class="search" style="visibility: hidden;">
                                 <div class="input-group custom-search-form">
                                     <input type="text" class="form-control" placeholder="Search...">
                                     <span class="input-group-btn">
@@ -84,9 +84,8 @@
                                         <i class="fa fa-search"></i>
                                     </button>
                                 </span>
-                                </div>      <!-- /input-group -->
-                            </li>
-
+                                </div>    
+                            </li>           <!-- Searchbar in Side Menu -->
                             
                             <!--    DASHBOARD LI ITEM 
                                     <li>
@@ -116,11 +115,10 @@
                 <!-- /.navbar-static-side -->
             </nav>
             <div id="wrapper">
-                <div id="page-wrapper" class="tab-content" style="background-image: url('/home/mirumer/Desktop/school.jpg')">
+                <div id="page-wrapper" class="tab-content">
                     {%block content%}
                         
                     {%endblock%}
-                    
                 </div>      <!-- /#page-wrapper -->
             </div>          <!-- /#wrapper -->
 

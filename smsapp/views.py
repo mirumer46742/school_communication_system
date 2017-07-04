@@ -5,69 +5,112 @@ import datetime
 import csv
 from django.shortcuts import render
 from django.views import generic
-from django.shortcuts import render_to_response,HttpResponseRedirect
+from django.shortcuts import render, render_to_response, HttpResponseRedirect
 
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login,logout
 from django.contrib import messages
-from models import Student, ContactFile,Message
+from models import Student, ContactFile, Message, MessageStatus
 from django.core.urlresolvers import reverse
 
 # Create your views here.
 
-class SendView(generic.FormView):
-    # print "INSIDE SEND VIEW"
+class SendView(generic.TemplateView):
     template_name="smsapp/index.html"
+    saved_students={}
 
     def get(self, request, *args, **kwargs):
-        student_list=Student.objects.all()
-        context = {"student_list":student_list}
-
-        print "GET METHOD OF SEND VIEW"
-        context["send_click"]=True
-        data = request.GET
-        student_class = data.get('class', None)
-        student_section = data.get('section', None)
-        student_roll_no = data.get('roll_no', None)
-
-        
-        if student_class == '' and student_section == '' and student_roll_no=='':
-            # print "NOTHING IS GIVEN---GET FULL SCHOOL LIST"
-            student=Student.objects.all()
-            context["all_students"]=student
-            if student:
-                context["show_table"]=True
-
-        elif student_section == '' and student_roll_no=='':
-            # print "ONLY CLASS IS GIVEN---GET CLASSWISE LIST"
-            student=Student.objects.filter(classes=student_class)
-            context["all_students"]=student
-            if student:
-                context["show_table"]=True
-
-        elif student_roll_no=='':
-            # print "CLASS and SECTION GIVEN ---GET CLASS AND SECTION LIST"
-            student=Student.objects.filter(classes=student_class, section=student_section)
-            context["all_students"]=student
-            if student:
-                context["show_table"]=True
-
-        elif student_class != '' and student_section != '' and student_roll_no!='':
-            # print "EVERYTHING IS GIVEN --- ---GET PARTICULAR STUDENT"
-            student=Student.objects.filter(classes=student_class, section=student_section, roll_no=student_roll_no)
-            context["all_students"]=student
-            if student:
-                context["show_table"]=True
-        
+        context={}
         return self.render_to_response(context)
 
     def post(self, request, *args, **kwargs):
-        context={}
-        data=request.POST
-        print "data in POST METHOD OF sendview",data
-        message_text=data.get('message_text')
-        message=Message(message=message_text)
-        message.save()
+
+        global saved_students 
+        student_list=Student.objects.all()
+        message_list = Message.objects.all()
+        context = {"student_list":student_list, "message_list":message_list}
+        context["send_click"]=True
+
+        data = request.POST
+        student_class = data.get('class', None)
+        student_section = data.get('section', None)
+        student_roll_no = data.get('roll_no', None)
+        message_text = data.get('message_text', None)
+
+        if 'get_student_list' in data:
+            print "Clicked GET LIST Button"
+
+            
+            if student_class == '' and student_section == '' and student_roll_no=='':
+                # print "NOTHING IS GIVEN---GET FULL SCHOOL LIST"
+                student=Student.objects.all()
+                if student.count()==0:
+                    context["no_student"]="No Students Available"
+                    return self.render_to_response(context)
+
+
+                context["all_students"]=student
+                if student:
+                    context["show_table"]=True
+                    saved_students=student
+
+            elif student_section == '' and student_roll_no=='':
+                # print "ONLY CLASS IS GIVEN---GET CLASSWISE LIST"
+                student=Student.objects.filter(classes=student_class)
+                if student.count()==0:
+                    context["no_student"]="No Students Available"
+                    return self.render_to_response(context)
+
+                context["all_students"]=student
+
+                if student:
+                    context["show_table"]=True
+                    saved_students=student
+
+            elif student_roll_no=='':
+                # print "CLASS and SECTION GIVEN ---GET CLASS AND SECTION LIST"
+                student=Student.objects.filter(classes=student_class, section=student_section)
+                if student.count()==0:
+                    context["no_student"]="No Such Students Available"
+                    return self.render_to_response(context)
+
+                context["all_students"]=student
+                if student:
+                    context["show_table"]=True
+                    saved_students=student
+
+            elif student_class != '' and student_section != '' and student_roll_no!='':
+                # print "EVERYTHING IS GIVEN --- ---GET PARTICULAR STUDENT"
+                student=Student.objects.filter(classes=student_class, section=student_section, roll_no=student_roll_no)
+                if student.count()==0:
+                    context["no_student"]="No Such Student Available"
+                    return self.render_to_response(context)
+
+                context["all_students"]=student
+                if student:
+                    context["show_table"]=True
+                    saved_students=student
+
+            # return self.render_to_response(context)
+
+        
+        if 'send_message_button' in data:
+            print "Clicked SEND MESSAGE"
+            if message_text and message_text != '':
+                context["message_sent"]="Message Sent Successfully"
+                print "Message is not Empty"
+                message = Message(message=message_text)
+                message.save()
+
+                # message_status = MessageStatus()
+                for student in saved_students:
+                    message.students.add(student)
+                return self.render_to_response(context)
+
+                # print "This Message", message_text,"being sent to:"
+                # for student in saved_students:
+                #     print student.classes
+
         return self.render_to_response(context)
 
 class BulkUploadView(generic.FormView):
@@ -77,14 +120,14 @@ class BulkUploadView(generic.FormView):
     def post(self, request, *args, **kwargs):
         context={}
         data=request.POST
-        print "data-------->",data
+        # print "data-------->",data
         filename=request.FILES['bulk_upload_file']
 
         contacts=ContactFile(filename=filename)
         contacts.save()
 
         filedata = csv.reader(filename)
-        print "FILEDATA------>",filedata
+        # print "FILEDATA------>",filedata
         for row in filedata:
             if filedata.line_num==1:
                 continue
@@ -107,20 +150,29 @@ class BulkUploadView(generic.FormView):
                         )
             student.save()
         
-            context["upload"]="Student File Uploaded Successfully"
+            # context["upload"]= "Student File Uploaded Successfully"
+            messages.success(request, "Student File Uploaded Successfully")
         return HttpResponseRedirect(reverse('dashboard'))
-        # return self.render_to_response("index.html",context)
+        # return self.render(request,'dashboard',context)
 
-class DashboardView(generic.FormView):
+class DashboardView(generic.TemplateView):
     template_name = "smsapp/index.html"
 
 
     def get(self, request, *args, **kwargs):
         # print "GET METHOD OF DASHBOARD VIEW"
         student_list=Student.objects.all()
-        context = {"student_list":student_list}
+        message_list = Message.objects.all()
+        user_list = User.objects.latest('id')
+        context = {"student_list":student_list, "message_list":message_list,"user_list":user_list}
+        context["dashboard_click"]=True
 
-        data=request.GET
+        data = request.GET
+
+        # if 'upload_button' in data:
+        #     context["upload"]="Student File Uploaded Successfully"
+        #     return render_to_response(context)
+
 
         student_id=data.get('student_id')
         if student_id:
@@ -128,6 +180,7 @@ class DashboardView(generic.FormView):
             context["student"]=student
             context["show"]=True
             context["edit_click"]=True
+            context["dashboard_click"]=False
         return self.render_to_response(context)
 
     def post(self, request, *args, **kwargs):
@@ -136,7 +189,7 @@ class DashboardView(generic.FormView):
         context = {"student_list":student_list}
         
         data = request.POST
-        print "-----------data from request.POST------------------",data
+        # print "-----------data from request.POST------------------",data
 
         if 'add_student_button' in data:
             first_name = data.get('first_name')
@@ -159,8 +212,7 @@ class DashboardView(generic.FormView):
             student.save()
             context["success"]="Student Added Succesfully"
             context["add_click"]=True
-            # return HttpResponseRedirect(reverse('login'))
-            print "**************************","You Clicked Add Student Button"
+            # print "**************************","You Clicked Add Student Button"
 
         elif 'edit_student_button' in data:
             first_name = data.get('edit_first_name')
@@ -185,11 +237,9 @@ class DashboardView(generic.FormView):
                         )
             context["edit_success"]="Student Data Updated Succesfully"
             context["edit_click"]=True
-            print "*************","You Clicked EDIT Student Button"
-        # return HttpResponseRedirect(reverse('logout'))
         return self.render_to_response(context)
 
-class LoginView(generic.FormView):
+class LoginView(generic.TemplateView):
 	template_name = "smsapp/signin.html"
 
 	def get(self, request, *args, **kwargs):
@@ -201,25 +251,19 @@ class LoginView(generic.FormView):
 	def post(self, request, *args, **kwargs):
 		context = {"error":"Provide correct credentials"}
 		data = request.POST
-		print data
 		username = data.get('username')
 		password = data.get('password')
-		user=authenticate(username=username,password=password)
-		# print user,"user"*2
+		user = authenticate(username=username,password=password)
 		try:
 			if user is not None:
-				# print user,"estt"*2
 				login(request,user)
 				return HttpResponseRedirect(reverse('dashboard'))
 			else:
-				# messages.error(request,"Either Username or Password is invalid")
 				return self.render_to_response(context)
 		except:
-			# messages.error(request,"Either Username or Password is invalid")
-			# print messages,"MESSAGES"
 			return self.render_to_response(context)
 
-class RegisterView(generic.FormView):
+class RegisterView(generic.TemplateView):
 	template_name = "smsapp/register.html"
 
 	def get(self, request, *args, **kwargs):
@@ -248,4 +292,7 @@ class LogoutView(generic.View):
 		if self.request.user.is_authenticated():
 			logout(self.request)
 		return HttpResponseRedirect(reverse('login'))
+
+class IndexView(generic.TemplateView):
+    template_name="smsapp/index.html"
 
