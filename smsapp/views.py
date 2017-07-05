@@ -92,25 +92,22 @@ class SendView(generic.TemplateView):
                     saved_students=student
 
             # return self.render_to_response(context)
-
-        
         if 'send_message_button' in data:
-            print "Clicked SEND MESSAGE"
+            # print "Clicked SEND MESSAGE"
             if message_text and message_text != '':
                 context["message_sent"]="Message Sent Successfully"
                 print "Message is not Empty"
                 message = Message(message=message_text)
                 message.save()
 
-                # message_status = MessageStatus()
                 for student in saved_students:
                     message.students.add(student)
                 return self.render_to_response(context)
-
-                # print "This Message", message_text,"being sent to:"
-                # for student in saved_students:
-                #     print student.classes
-
+            else:
+                # messages.error(request,"No Message Sent", extra_tags='alert-danger')
+                context["message_not_sent"]="Message not Sent"
+                return self.render_to_response(context)
+                        
         return self.render_to_response(context)
 
 class BulkUploadView(generic.FormView):
@@ -120,14 +117,12 @@ class BulkUploadView(generic.FormView):
     def post(self, request, *args, **kwargs):
         context={}
         data=request.POST
-        # print "data-------->",data
         filename=request.FILES['bulk_upload_file']
 
         contacts=ContactFile(filename=filename)
         contacts.save()
 
         filedata = csv.reader(filename)
-        # print "FILEDATA------>",filedata
         for row in filedata:
             if filedata.line_num==1:
                 continue
@@ -150,8 +145,8 @@ class BulkUploadView(generic.FormView):
                         )
             student.save()
         
-            # context["upload"]= "Student File Uploaded Successfully"
-            messages.success(request, "Student File Uploaded Successfully")
+            
+        messages.success(request, "Student File Uploaded Successfully", extra_tags='alert-success')
         return HttpResponseRedirect(reverse('dashboard'))
         # return self.render(request,'dashboard',context)
 
@@ -160,19 +155,15 @@ class DashboardView(generic.TemplateView):
 
 
     def get(self, request, *args, **kwargs):
-        # print "GET METHOD OF DASHBOARD VIEW"
         student_list=Student.objects.all()
+        # reverse_student_list = Student.objects.all().order_by('-added_date')
         message_list = Message.objects.all()
         user_list = User.objects.latest('id')
         context = {"student_list":student_list, "message_list":message_list,"user_list":user_list}
         context["dashboard_click"]=True
+        # context["reverse_student_list"]=reverse_student_list
 
         data = request.GET
-
-        # if 'upload_button' in data:
-        #     context["upload"]="Student File Uploaded Successfully"
-        #     return render_to_response(context)
-
 
         student_id=data.get('student_id')
         if student_id:
@@ -273,26 +264,23 @@ class RegisterView(generic.TemplateView):
 	def post(self, request, *args, **kwargs):
 		context = {"success":"Profile created successfully. Kindly Login"}
 		data=request.POST
-		# print data
+
 		firstname=data.get('first_name')
 		lastname=data.get('last_name')
 		email=data.get('email')
 		username = data.get('username')
 		password = data.get('password')
+
 		user = User.objects.create_user(first_name=firstname,last_name=lastname,email=email,username=username)
 		user.set_password(password)
-		# print user,"Create User Object"
 		user.save()
-		# print user,"Saved to database already"
+		
 		return self.render_to_response(context)
-		# return HttpResponseRedirect(reverse('login'))
-
+		
 class LogoutView(generic.View):
 	def get(self, request, *args, **kwargs):
 		if self.request.user.is_authenticated():
 			logout(self.request)
 		return HttpResponseRedirect(reverse('login'))
 
-class IndexView(generic.TemplateView):
-    template_name="smsapp/index.html"
 

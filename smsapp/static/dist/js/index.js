@@ -281,17 +281,17 @@ $(document).ready(function(){
             }
         }
     });
-
-   /* $('#select_all_checkbox').click(function() {
-        $(this.table.elements).filter(':checkbox').attr('checked', this.checked);
-    });
-*/
-    $('#select_all_checkbox').click(function() {
-    if ($(this).is(':checked')) {
-        $('td input').attr('checked', true);
-    } else {
-        $('td input').attr('checked', false);
-    }
-    });
-
 });
+    
+
+
+    /*  $('#select_all').click(function() {
+            if ($(this).is(':checked')) {
+                $('td input').attr('checked', true);
+            } else {
+                $('td input').attr('checked', false);
+            }
+        });
+    */
+
+
