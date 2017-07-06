@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from django.conf import settings
+
 import datetime
 import csv
 from django.shortcuts import render
@@ -15,9 +17,50 @@ from django.core.urlresolvers import reverse
 
 # Create your views here.
 
+from twilio.rest import Client
+from django.core.exceptions import MiddlewareNotUsed
+import os
+import logging
+
+logger = logging.getLogger(__name__)
+
+NOT_CONFIGURED_MESSAGE = """Cannot initialize Twilio notification
+middleware. Required enviroment variables TWILIO_ACCOUNT_SID, or
+TWILIO_AUTH_TOKEN or TWILIO_NUMBER missing"""
+
+
+def load_twilio_config():
+    twilio_account_sid = settings.TWILIO_ACCOUNT_SID
+    twilio_auth_token = settings.TWILIO_AUTH_TOKEN
+    twilio_number = settings.TWILIO_NUMBER
+
+
+    if not all([twilio_account_sid, twilio_auth_token, twilio_number]):
+        logger.error(NOT_CONFIGURED_MESSAGE)
+        raise MiddlewareNotUsed
+
+    return (twilio_number, twilio_account_sid, twilio_auth_token)
+
+class MessageClient(object):
+    def __init__(self):
+        (twilio_number, twilio_account_sid, twilio_auth_token) = load_twilio_config()
+
+        self.twilio_number = twilio_number
+        self.twilio_client = Client(twilio_account_sid,
+                                              twilio_auth_token)
+
+    def send_message(self, body, to):
+        self.twilio_client.messages.create(body=body, to=to,
+                                           from_=self.twilio_number,
+                                           # media_url=['https://demo.twilio.com/owl.png'])
+                                           )
+
+
+
 class SendView(generic.TemplateView):
     template_name="smsapp/index.html"
     saved_students={}
+
 
     def get(self, request, *args, **kwargs):
         context={}
@@ -38,8 +81,6 @@ class SendView(generic.TemplateView):
         message_text = data.get('message_text', None)
 
         if 'get_student_list' in data:
-            print "Clicked GET LIST Button"
-
             
             if student_class == '' and student_section == '' and student_roll_no=='':
                 # print "NOTHING IS GIVEN---GET FULL SCHOOL LIST"
@@ -91,20 +132,22 @@ class SendView(generic.TemplateView):
                     context["show_table"]=True
                     saved_students=student
 
-            # return self.render_to_response(context)
         if 'send_message_button' in data:
-            # print "Clicked SEND MESSAGE"
             if message_text and message_text != '':
-                context["message_sent"]="Message Sent Successfully"
-                print "Message is not Empty"
                 message = Message(message=message_text)
                 message.save()
+                context["message_sent"]="Message Sent Successfully"
+
+                twilio_client=MessageClient()
+                twilio_client.send_message(message_text,'+919596062959')
+                
+                # for student in saved_students:
+                #     twilio_client.send_message(message_text,student.contact)
 
                 for student in saved_students:
                     message.students.add(student)
                 return self.render_to_response(context)
             else:
-                # messages.error(request,"No Message Sent", extra_tags='alert-danger')
                 context["message_not_sent"]="Message not Sent"
                 return self.render_to_response(context)
                         
@@ -148,7 +191,6 @@ class BulkUploadView(generic.FormView):
             
         messages.success(request, "Student File Uploaded Successfully", extra_tags='alert-success')
         return HttpResponseRedirect(reverse('dashboard'))
-        # return self.render(request,'dashboard',context)
 
 class DashboardView(generic.TemplateView):
     template_name = "smsapp/index.html"
@@ -180,7 +222,6 @@ class DashboardView(generic.TemplateView):
         context = {"student_list":student_list}
         
         data = request.POST
-        # print "-----------data from request.POST------------------",data
 
         if 'add_student_button' in data:
             first_name = data.get('first_name')
@@ -203,7 +244,6 @@ class DashboardView(generic.TemplateView):
             student.save()
             context["success"]="Student Added Succesfully"
             context["add_click"]=True
-            # print "**************************","You Clicked Add Student Button"
 
         elif 'edit_student_button' in data:
             first_name = data.get('edit_first_name')
@@ -282,5 +322,10 @@ class LogoutView(generic.View):
 		if self.request.user.is_authenticated():
 			logout(self.request)
 		return HttpResponseRedirect(reverse('login'))
+
+
+
+
+
 
 

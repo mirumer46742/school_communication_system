@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'twilio'
 ]
 
 MIDDLEWARE = [
@@ -86,6 +87,12 @@ DATABASES = {
         }
     }
 }
+
+TWILIO_ACCOUNT_SID = "AC4aa999a61d3c558477d3a7b1a08501c0"
+TWILIO_AUTH_TOKEN = "d153321d442e8d80ebe6dd9a5156e291"
+TWILIO_NUMBER = "+12139557198"
+
+
 
 
 # Password validation
