@@ -39,16 +39,3 @@ class MessageStatus(models.Model):
 	sent_date = models.DateTimeField(auto_now = True)
 	message = models.ForeignKey(Message)
 
-
-
-
-
-
-
-
-
-
-
-
-
-

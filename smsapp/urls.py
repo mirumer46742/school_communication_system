@@ -13,8 +13,8 @@ from smsapp.views import BulkUploadView
 urlpatterns=[
 	url(r'^$',RegisterView.as_view(),name='register'),
 	url(r'^login/$',LoginView.as_view(),name='login'),
-	url(r'^home/$', login_required(DashboardView.as_view()), name='dashboard'),
-	url(r'^send/$', SendView.as_view(), name='send'),
-	url(r'^bulk_upload/$', BulkUploadView.as_view(), name='bulk_upload'),
+	url(r'^dashboard/$', login_required(DashboardView.as_view()), name='dashboard'),
+	url(r'^send/$', login_required(SendView.as_view()), name='send'),
+	url(r'^bulk_upload/$', login_required(BulkUploadView.as_view()), name='bulk_upload'),
 	url(r'^logout/$', LogoutView.as_view(), name='logout'),
 ]
