@@ -25,7 +25,7 @@ SECRET_KEY = 'jpy12h2-$l0u2xhgy&*#4^s_g#ge1-d3l(l6=+^7s+wix0zodp'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["162.243.66.242",]
 
 
 # Application definition
@@ -80,10 +80,9 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'sms_database',
         'USER':'root',
-        'PASSWORD':'login',
-        'OPTIONS': {
-            'sql_mode': 'traditional',
-        }
+        'PASSWORD':'cwLo5n3ToI',
+        'HOST':'',
+	'PORT':'',
     }
 }
 
@@ -131,4 +130,5 @@ FILE_ROOT = os.path.join(MEDIA_ROOT, 'media/document'),
 
 STATIC_URL = '/static/'
 
+STATIC_ROOT = "/var/www/school_communication_system/smsapp/static/"
 
