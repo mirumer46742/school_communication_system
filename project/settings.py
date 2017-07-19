@@ -25,7 +25,7 @@ SECRET_KEY = 'jpy12h2-$l0u2xhgy&*#4^s_g#ge1-d3l(l6=+^7s+wix0zodp'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["127.0.0.1"]
 
 
 # Application definition
@@ -139,3 +139,4 @@ FILE_ROOT = os.path.join(MEDIA_ROOT, 'media/document'),
 STATIC_URL = '/static/'
 
 
+STATIC_ROOT = os.path.join(BASE_DIR,'static')

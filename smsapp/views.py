@@ -69,8 +69,8 @@ class SendView(generic.TemplateView):
     def post(self, request, *args, **kwargs):
 
         global saved_students 
-        student_list=Student.objects.all()
-        message_list = Message.objects.all()
+        student_list=Student.objects.filter(user_id=current_user_id)
+        message_list = Message.objects.filter(user_id=current_user_id)
         context = {"student_list":student_list, "message_list":message_list}
         context["send_click"]=True
 
@@ -84,7 +84,7 @@ class SendView(generic.TemplateView):
             
             if student_class == '' and student_section == '' and student_roll_no=='':
                 # print "NOTHING IS GIVEN---GET FULL SCHOOL LIST"
-                student=Student.objects.all()
+                student=Student.objects.filter(user_id=current_user_id)
                 if student.count()==0:
                     context["no_student"]="No Students Available"
                     return self.render_to_response(context)
@@ -97,7 +97,7 @@ class SendView(generic.TemplateView):
 
             elif student_section == '' and student_roll_no=='':
                 # print "ONLY CLASS IS GIVEN---GET CLASSWISE LIST"
-                student=Student.objects.filter(classes=student_class)
+                student=Student.objects.filter(classes=student_class, user_id=current_user_id)
                 if student.count()==0:
                     context["no_student"]="No Students Available"
                     return self.render_to_response(context)
@@ -110,7 +110,7 @@ class SendView(generic.TemplateView):
 
             elif student_roll_no=='':
                 # print "CLASS and SECTION GIVEN ---GET CLASS AND SECTION LIST"
-                student=Student.objects.filter(classes=student_class, section=student_section)
+                student=Student.objects.filter(classes=student_class, section=student_section, user_id=current_user_id)
                 if student.count()==0:
                     context["no_student"]="No Such Students Available"
                     return self.render_to_response(context)
@@ -122,7 +122,7 @@ class SendView(generic.TemplateView):
 
             elif student_class != '' and student_section != '' and student_roll_no!='':
                 # print "EVERYTHING IS GIVEN --- ---GET PARTICULAR STUDENT"
-                student=Student.objects.filter(classes=student_class, section=student_section, roll_no=student_roll_no)
+                student=Student.objects.filter(classes=student_class, section=student_section, roll_no=student_roll_no, user_id=current_user_id)
                 if student.count()==0:
                     context["no_student"]="No Such Student Available"
                     return self.render_to_response(context)
@@ -134,7 +134,7 @@ class SendView(generic.TemplateView):
 
         if 'send_message_button' in data:
             if message_text and message_text != '':
-                message = Message(message=message_text)
+                message = Message(message=message_text, user_id=current_user_id)
                 message.save()
                 context["message_sent"]="Message Sent Successfully"
 
@@ -184,7 +184,8 @@ class BulkUploadView(generic.FormView):
                         first_name = first_name, last_name = last_name,
                         parentage = parentage, email = email, contact = contact,
                         gender = gender, address = address, pincode = pincode,
-                        classes = classes, section = section,roll_no = roll_no
+                        classes = classes, section = section,roll_no = roll_no,
+                        user_id=current_user_id
                         )
             student.save()
         
@@ -197,28 +198,33 @@ class DashboardView(generic.TemplateView):
 
 
     def get(self, request, *args, **kwargs):
-        student_list=Student.objects.all()
-        # reverse_student_list = Student.objects.all().order_by('-added_date')
-        message_list = Message.objects.all()
-        user_list = User.objects.latest('id')
-        context = {"student_list":student_list, "message_list":message_list,"user_list":user_list}
-        context["dashboard_click"]=True
-        # context["reverse_student_list"]=reverse_student_list
+        global current_user_id
 
+        current_user_id = request.user.id
+        print"CURRENT LOGGED USER",current_user_id
+
+        student_list = Student.objects.filter(user_id=current_user_id)
+        # reverse_student_list = Student.objects.all().order_by('-added_date')
+        message_list = Message.objects.filter(user_id=current_user_id)
+        user_list = User.objects.latest('id')
+        
+        context = {"student_list":student_list, "message_list":message_list,"user_list":user_list}
+        context["dashboard_click"]=True        
+        
         data = request.GET
 
-        student_id=data.get('student_id')
+        student_id = data.get('student_id')
         if student_id:
-            student=Student.objects.get(id=student_id)
-            context["student"]=student
-            context["show"]=True
-            context["edit_click"]=True
-            context["dashboard_click"]=False
+            student = Student.objects.get(id=student_id)
+            context["student"] = student
+            context["show"] = True
+            context["edit_click"] = True
+            context["dashboard_click"] = False
         return self.render_to_response(context)
 
     def post(self, request, *args, **kwargs):
         context = {}
-        student_list=Student.objects.all()
+        student_list = Student.objects.all()
         context = {"student_list":student_list}
         
         data = request.POST
@@ -235,11 +241,13 @@ class DashboardView(generic.TemplateView):
             classes = data.get('class')
             section = data.get('section')
             roll_no = data.get('roll_no')
+
             student=Student(
                         first_name = first_name, last_name = last_name,
                         parentage = parentage, email = email, contact = contact,
                         gender = gender, address = address, pincode = pincode,
-                        classes = classes, section = section,roll_no = roll_no
+                        classes = classes, section = section,roll_no = roll_no,
+                        user_id=current_user_id
                         )
             student.save()
             context["success"]="Student Added Succesfully"
@@ -274,19 +282,29 @@ class LoginView(generic.TemplateView):
 	template_name = "smsapp/signin.html"
 
 	def get(self, request, *args, **kwargs):
+
 		if request.user.is_authenticated():
+			current_user= request.user
+			print "CURRENT USER ID", current_user.id
 			return HttpResponseRedirect(reverse('dashboard'))
 		context = {}
 		return self.render_to_response(context)
 
 	def post(self, request, *args, **kwargs):
 		context = {"error":"Provide correct credentials"}
+		# current_user=request.user
 		data = request.POST
+				
+		
 		username = data.get('username')
 		password = data.get('password')
+		print(username,password)
+		# print "USER",current_user
 		user = authenticate(username=username,password=password)
 		try:
 			if user is not None:
+				print user
+				
 				login(request,user)
 				return HttpResponseRedirect(reverse('dashboard'))
 			else:
@@ -302,7 +320,7 @@ class RegisterView(generic.TemplateView):
 		return self.render_to_response(context)
 
 	def post(self, request, *args, **kwargs):
-		context = {"success":"Profile created successfully. Kindly Login"}
+		context = {}
 		data=request.POST
 
 		firstname=data.get('first_name')
@@ -311,10 +329,13 @@ class RegisterView(generic.TemplateView):
 		username = data.get('username')
 		password = data.get('password')
 
-		user = User.objects.create_user(first_name=firstname,last_name=lastname,email=email,username=username)
-		user.set_password(password)
-		user.save()
-		
+		if User.objects.filter(username = username).exists():
+			context["username_error"]="This Username already Exists"
+		else:
+			user = User.objects.create_user(first_name=firstname,last_name=lastname,email=email,username=username)
+			user.set_password(password)
+			user.save()
+			context["success"]="Profile created successfully. Kindly Login"
 		return self.render_to_response(context)
 		
 class LogoutView(generic.View):

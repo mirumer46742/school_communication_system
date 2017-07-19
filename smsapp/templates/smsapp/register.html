@@ -30,6 +30,11 @@
                                 <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>{{success}}
                                 </div>
                             {%endif%}
+                            {%if username_error%}
+                                <div class="alert alert-danger alert-dismissable fade in">
+                                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>{{username_error}}
+                                </div>
+                            {%endif%}
 
 
                             <div class="row">

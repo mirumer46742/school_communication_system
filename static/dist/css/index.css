@@ -1,0 +1,24 @@
+#success_message{ display: none;}
+
+
+.gap{display: inline;
+	margin-left: 10px;
+}
+
+#filebox{
+    height:25px;
+    padding:0px 0px;
+    font-size: 15px;
+}
+.modal-dialog{
+    margin: 5% 25%;
+} 
+.modal-body{
+    margin: 0% 10%;
+}
+.modal-body form{
+    margin-top: 5px;
+}
+.btndiv{
+    margin-top: 10px;
+}
