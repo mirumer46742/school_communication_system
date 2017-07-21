@@ -65,13 +65,32 @@ class SendView(generic.TemplateView):
 
     def get(self, request, *args, **kwargs):
         context={}
-        # if request.is_ajax():
-        #     data = request.GET
-        #     data.get()
+        if request.is_ajax():
+            data = request.GET
+            classes=data.get('select_class')
+            section=data.get('select_section')
 
+            print "data------------>",data
+            
+            if 'select_section' in data:
+                student=Student.objects.filter(classes=classes, section=section, user_id=current_user_id)
+                student_list=[]
+                for std in student:
+                    if std.roll_no not in student_list:
+                        student_list.append(std.roll_no)
+                response_data = sorted(student_list)
+                print "Response:",response_data
 
+            elif 'select_class' in data: 
+                student=Student.objects.filter(classes=classes, user_id=current_user_id)
+                student_list=[]
+                for std in student:
+                    if std.section not in student_list:
+                        student_list.append(std.section)
+                response_data = sorted(student_list)
+                print "RESPONSE",response_data
 
-
+            return JsonResponse(response_data, safe=False)
 
         return self.render_to_response(context)
 
