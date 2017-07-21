@@ -8,12 +8,16 @@ import csv
 from django.shortcuts import render
 from django.views import generic
 from django.shortcuts import render, render_to_response, HttpResponseRedirect
+from django.http import HttpResponse
 
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login,logout
 from django.contrib import messages
 from models import Student, ContactFile, Message, MessageStatus
 from django.core.urlresolvers import reverse
+from django.http import JsonResponse
+import json
+from django.core import serializers
 
 # Create your views here.
 
@@ -55,15 +59,20 @@ class MessageClient(object):
                                            # media_url=['https://demo.twilio.com/owl.png'])
                                            )
 
-
-
 class SendView(generic.TemplateView):
     template_name="smsapp/index.html"
     saved_students={}
 
-
     def get(self, request, *args, **kwargs):
         context={}
+        # if request.is_ajax():
+        #     data = request.GET
+        #     data.get()
+
+
+
+
+
         return self.render_to_response(context)
 
     def post(self, request, *args, **kwargs):
@@ -201,33 +210,37 @@ class DashboardView(generic.TemplateView):
         global current_user_id
 
         current_user_id = request.user.id
-        print"CURRENT LOGGED USER",current_user_id
 
         student_list = Student.objects.filter(user_id=current_user_id)
-        # reverse_student_list = Student.objects.all().order_by('-added_date')
         message_list = Message.objects.filter(user_id=current_user_id)
         user_list = User.objects.latest('id')
         
-        context = {"student_list":student_list, "message_list":message_list,"user_list":user_list}
-        context["dashboard_click"]=True        
+        context = {'student_list':student_list, 'message_list':message_list,'user_list':user_list}
+        context['dashboard_click']=True        
         
         data = request.GET
-
         student_id = data.get('student_id')
-        if student_id:
-            student = Student.objects.get(id=student_id)
-            context["student"] = student
-            context["show"] = True
-            context["edit_click"] = True
-            context["dashboard_click"] = False
+        if request.is_ajax():
+
+            obj_json = serializers.serialize('json', Student.objects.filter(id=student_id))
+            obj_list = json.loads(obj_json)
+            json_data = json.dumps(obj_list)
+
+            print "--------------------"
+            print "JSON Data", json_data
+            print "--------------------"
+            
+            return HttpResponse(json_data, content_type='application/json')
+
         return self.render_to_response(context)
 
     def post(self, request, *args, **kwargs):
         context = {}
-        student_list = Student.objects.all()
+        student_list = Student.objects.filter(user_id=current_user_id)
         context = {"student_list":student_list}
         
         data = request.POST
+        print "DATA POST",data
 
         if 'add_student_button' in data:
             first_name = data.get('first_name')
@@ -317,6 +330,13 @@ class RegisterView(generic.TemplateView):
 
 	def get(self, request, *args, **kwargs):
 		context = {}
+		username = request.GET.get('username')
+
+		if request.is_ajax():
+			context['is_taken'] = User.objects.filter(username__iexact = username).exists()
+			if context['is_taken']:
+				context['username_error']="Username already taken by someone"
+				return JsonResponse(context)
 		return self.render_to_response(context)
 
 	def post(self, request, *args, **kwargs):
@@ -329,8 +349,11 @@ class RegisterView(generic.TemplateView):
 		username = data.get('username')
 		password = data.get('password')
 
-		if User.objects.filter(username = username).exists():
-			context["username_error"]="This Username already Exists"
+		context = {
+			'is_taken': User.objects.filter(username__iexact = username).exists()
+		}
+		if context['is_taken']:
+			context["username_error"]="Kindly change Username as this username already taken."
 		else:
 			user = User.objects.create_user(first_name=firstname,last_name=lastname,email=email,username=username)
 			user.set_password(password)
