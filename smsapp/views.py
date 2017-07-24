@@ -69,9 +69,10 @@ class SendView(generic.TemplateView):
             data = request.GET
             classes=data.get('select_class')
             section=data.get('select_section')
-
-            print "data------------>",data
+            # print "data------------>",data
             
+
+            #CLASS AND SECTION SELECTED
             if 'select_section' in data:
                 student=Student.objects.filter(classes=classes, section=section, user_id=current_user_id)
                 student_list=[]
@@ -79,16 +80,17 @@ class SendView(generic.TemplateView):
                     if std.roll_no not in student_list:
                         student_list.append(std.roll_no)
                 response_data = sorted(student_list)
-                print "Response:",response_data
+                
 
-            elif 'select_class' in data: 
+            # CLASS SELECTED
+            elif 'select_class' in data:
                 student=Student.objects.filter(classes=classes, user_id=current_user_id)
                 student_list=[]
                 for std in student:
                     if std.section not in student_list:
                         student_list.append(std.section)
                 response_data = sorted(student_list)
-                print "RESPONSE",response_data
+                
 
             return JsonResponse(response_data, safe=False)
 
@@ -103,6 +105,7 @@ class SendView(generic.TemplateView):
         context["send_click"]=True
 
         data = request.POST
+        # print "POST DATA:",data
         student_class = data.get('class', None)
         student_section = data.get('section', None)
         student_roll_no = data.get('roll_no', None)
@@ -110,8 +113,8 @@ class SendView(generic.TemplateView):
 
         if 'get_student_list' in data:
             
-            if student_class == '' and student_section == '' and student_roll_no=='':
-                # print "NOTHING IS GIVEN---GET FULL SCHOOL LIST"
+            if student_class == '': #and student_section == '' and student_roll_no=='':
+                # print "NOTHING IS SELECTED---GET FULL LIST"
                 student=Student.objects.filter(user_id=current_user_id)
                 if student.count()==0:
                     context["no_student"]="No Students Available"
@@ -123,8 +126,8 @@ class SendView(generic.TemplateView):
                     context["show_table"]=True
                     saved_students=student
 
-            elif student_section == '' and student_roll_no=='':
-                # print "ONLY CLASS IS GIVEN---GET CLASSWISE LIST"
+            elif student_section == '': # and student_roll_no=='':
+                # print "ONLY CLASS IS SELECTED---GET CLASSWISE LIST"
                 student=Student.objects.filter(classes=student_class, user_id=current_user_id)
                 if student.count()==0:
                     context["no_student"]="No Students Available"
@@ -245,9 +248,9 @@ class DashboardView(generic.TemplateView):
             obj_list = json.loads(obj_json)
             json_data = json.dumps(obj_list)
 
-            print "--------------------"
-            print "JSON Data", json_data
-            print "--------------------"
+            # print "--------------------"
+            # print "JSON Data", json_data
+            # print "--------------------"
             
             return HttpResponse(json_data, content_type='application/json')
 
@@ -259,7 +262,7 @@ class DashboardView(generic.TemplateView):
         context = {"student_list":student_list}
         
         data = request.POST
-        print "DATA POST",data
+        # print "DATA POST",data
 
         if 'add_student_button' in data:
             first_name = data.get('first_name')
@@ -317,7 +320,7 @@ class LoginView(generic.TemplateView):
 
 		if request.user.is_authenticated():
 			current_user= request.user
-			print "CURRENT USER ID", current_user.id
+			# print "CURRENT USER ID", current_user.id
 			return HttpResponseRedirect(reverse('dashboard'))
 		context = {}
 		return self.render_to_response(context)
@@ -335,8 +338,7 @@ class LoginView(generic.TemplateView):
 		user = authenticate(username=username,password=password)
 		try:
 			if user is not None:
-				print user
-				
+				# print user
 				login(request,user)
 				return HttpResponseRedirect(reverse('dashboard'))
 			else:

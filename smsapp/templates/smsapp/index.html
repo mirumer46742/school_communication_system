@@ -755,6 +755,7 @@
                   <div class="row">
                       
                       <div class="col-lg-12">
+                      {% if student_list|length > 0 %}
                           <table border="0" cellpadding='8' cellspacing='10' class="table table-striped table-responsive">
                                           <tr>
                                               <td align="right" colspan="10"></td>
@@ -785,6 +786,11 @@
                                             </tr>
                                           {% endfor %}
                           </table>
+                      {% endif%}
+
+                      <!-- {% if student_list|length <= 0 %}
+                      <p>Welcome to the Group.. You can Add Students or Upload CSV File</p>
+                      {% endif%} -->
                       </div>       
                   </div>        <!-- /.BOTTOM ROW-->
               </div>  
@@ -813,6 +819,7 @@
                      },
                 success: function(data) 
                 {
+                    console.log(data)
                     $('#edit_contact_form').show()
                     var gender=data[0].fields["gender"]
                     
@@ -842,7 +849,9 @@
             });
         });      //Display Student Details on the basis of Student ID for Editing
 
-        
+        $('#class').click(function(){
+          $('#section').find('option').not(':first').remove()
+        });     //Clear Section if different Classes selected at a time       
 
 
         $('#class').change(function(){
@@ -858,7 +867,7 @@
                    console.log(data)
 
                     if (data.length!=0){
-                         $('#section').attr("disabled",false);     
+                        $('#section').attr("disabled",false);     
                         for (x in data)
                         {
                             var sel = document.getElementById("section");
@@ -872,6 +881,10 @@
             });      
 
         }); //Display Section based on which class is selected
+
+        $('#section').click(function(){
+          $('#roll_no').find('option').not(':first').remove()
+        });     //Clear Roll_Nos if difefrent Sections selected at a time       
 
         $('#section').change(function(){
             var select_section = $(this).val();
@@ -887,7 +900,7 @@
                 {
                     console.log(data)
                     if (data.length!=0){
-                         $('#roll_no').attr("disabled",false);     
+                        $('#roll_no').attr("disabled",false);     
                         for (x in data)
                         {
                             var sel = document.getElementById("roll_no");
@@ -896,8 +909,6 @@
                             sel.add(option);
                         }
                     }
-
-                    // $('#roll_no').attr("disabled",false)
                 }
             });      
 
