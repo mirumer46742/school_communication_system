@@ -25,7 +25,7 @@ SECRET_KEY = 'jpy12h2-$l0u2xhgy&*#4^s_g#ge1-d3l(l6=+^7s+wix0zodp'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["162.243.66.242",]
+ALLOWED_HOSTS = ["162.243.66.242","school-communication.ainfo.io"]
 
 
 # Application definition
