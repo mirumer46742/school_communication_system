@@ -81,10 +81,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'sms_database',
         'USER':'root',
-        'PASSWORD':'login',
-        'OPTIONS': {
-            'sql_mode': 'traditional',
-        }
+        'PASSWORD':'cwLo5n3ToI',
     }
 }
 
