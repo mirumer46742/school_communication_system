@@ -241,25 +241,53 @@
                         
                     <div class="edit_student_container">
                                        
-                          <form id="show_student_list">
-                          
+                          <form id="edit_student_list">
                               <div class="row" >
-                                    <div class="col-md-4">
-                                    </div>
+                                <!-- CODE FOR EDIT STUDENT BY STUDENT_ID -->
+                                <div class="col-sm-6 col-md-3" style="margin-bottom: 10px">
+                                  
+                                      <select name="edit_class" id="edit_class" class="form-control selectpicker" style="border-radius: 4px;" >
+                                        <option value='' style="color: grey"> Select Class</option>
+                                          <option>12th</option>
+                                          <option>11th</option>
+                                          <option>10th</option>
+                                          <option>9th</option>
+                                          <option>8th</option>
+                                          <option>7th</option>
+                                          <option>6th</option>
+                                          <option>5th</option>
+                                          <option>4th</option>
+                                          <option>3rd</option>
+                                          <option>2nd</option>
+                                          <option>1st</option>
+                                          <option>UKG</option>
+                                          <option>LKG</option>
+                                          <option>Nursery</option>
+                                      </select>
+                                  
+                                </div>
 
-                                    <div class="col-md-4 selectContainer" style="margin-bottom: 30px";>
-                                        <div class="input-group">
-                                          <span class="input-group-addon"><i class="glyphicon glyphicon-list"></i></span>
-                                          <select name="student_id" class="form-control selectpicker student_id" >
-                                            <option style="color: grey" >Student ID</option>
-                                            {% for student in student_list %}
-                                              <option>{{student.id}}</option>
-                                            {% endfor %}                                            
-                                          </select>
-                                          <!-- <span class="input-group-btn"><button type="submit" name="student_list" class="btn btn-default student_list" disabled>Show Data</button></span> -->
-                                        </div>
-                                    </div>
+                                <div class="col-sm-6 col-md-3" style="margin-bottom: 10px">
+                                    
+                                        <select name="edit_section" id="edit_section" class="form-control selectpicker" style="border-radius: 4px;" >
+                                          <option value='' style="color: grey">Select Section</option> 
+                                        </select>
+                                    
+                                </div>
 
+                                <div class="col-sm-6 col-md-3" style="margin-bottom: 10px">
+                                    
+                                        <select name="edit_roll_no" id="edit_roll_no" class="form-control selectpicker" style="border-radius: 4px;">
+                                          <option value='' style="color: grey">Select Roll No</option>
+                                    
+                                        </select>
+
+                                </div>
+
+                                <div class="col-sm-6 col-md-3" style="margin-bottom: 10px">
+                                      <button type="button" name="get_edit_student" id="get_edit_student" class="btn btn-success btn-block"> Show Students</button>
+                                </div>
+                                    
                               </div>
                           </form>
                         
@@ -387,9 +415,9 @@
                                       <div class="col-md-4 selectContainer">
                                       <div class="input-group">
                                           <span class="input-group-addon"><i class="glyphicon glyphicon-copyright-mark"></i></span>
-                                      <select name="edit_class" class="form-control selectpicker" >
+                                      <select name="edit_class_value" class="form-control selectpicker" >
                                       <optgroup>
-                                        <option id ="edit_class">{{student.classes}}</option>
+                                        <option id ="edit_class_value">{{student.classes}}</option>
                                       </optgroup>
                                       <optgroup label= ------------------------------------------------------->
                                           <option>12th</option>
@@ -421,9 +449,9 @@
                                       <div class="col-md-4 selectContainer">
                                       <div class="input-group">
                                           <span class="input-group-addon"><i class="glyphicon glyphicon-console"></i></span>
-                                      <select name="edit_section" class="form-control selectpicker" >
+                                      <select name="edit_section_value" class="form-control selectpicker" >
                                         <optgroup>
-                                          <option id="edit_section">{{student.section}}</option>
+                                          <option id="edit_section_value">{{student.section}}</option>
                                         </optgroup>
                                         <optgroup label= ------------------------------------------------------->
                                           <option>A</option>
@@ -444,7 +472,7 @@
                                       <div class="col-md-4 inputGroupContainer">
                                       <div class="input-group">
                                           <span class="input-group-addon"><i class="glyphicon glyphicon-registration-mark"></i></span>
-                                    <input name="edit_roll_no" class="form-control"  type="text" value={{student.roll_no}}>
+                                    <input name="edit_roll_no_value" class="form-control"  type="text" value={{student.roll_no}}>
                                       </div>
                                     </div>
                                   </div>
@@ -806,21 +834,122 @@
     {
         $('#section').attr("disabled",true)
         $('#roll_no').attr("disabled",true) 
+        $('#edit_section').attr("disabled",true)
+        $('#edit_roll_no').attr("disabled",true)
+        $('#get_edit_student').attr("disabled",true)
+
+
+
+        $('#edit_class').click(function(){
+          $('#edit_section').find('option').not(':first').remove()
+          $('#edit_roll_no').find('option').not(':first').remove()
+
+        });     //Clear Section if different Classes selected at a time       
+
+
+        $('#edit_class').change(function(){
+            var select_class = $(this).val();
+
+            $.ajax({
+                url: '{% url "send"%}',
+                data:{
+                        'select_class': select_class,
+                     },
+                success: function(data)
+                {
+                   console.log(data)
+
+                    $('#edit_section').attr("disabled",true);
+                    $('#edit_roll_no').attr("disabled",true);
+                    $('#get_edit_student').attr("disabled",true);
+                    if (data.length!=0){
+                        $('#edit_section').attr("disabled",false);
+                        
+                        for (x in data)
+                        {
+                            var sel = document.getElementById("edit_section");
+                            var option = document.createElement("option");
+                            option.text = data[x];
+                            sel.add(option);
+                        }
+                    }
+                    
+                }
+            });      
+
+        }); //Display Section based on which class is selected
+
+        $('#edit_section').click(function(){
+          $('#edit_roll_no').find('option').not(':first').remove()
+        });     //Clear Roll_Nos if difefrent Sections selected at a time       
+
+        $('#edit_section').change(function(){
+            var select_section = $(this).val();
+            var select_class = $("#edit_class").val();
+
+            $.ajax({
+                url: '{% url "send"%}',
+                data:{
+                        'select_section': select_section,
+                        'select_class' : select_class,  
+                     },
+                success: function(data)
+                {
+                    console.log(data)
+                    $('#edit_roll_no').attr("disabled",true);
+                    $('#get_edit_student').attr("disabled",true);
+
+                    if (data.length!=0){
+                        $('#edit_roll_no').attr("disabled",false);
+                        
+                        // $('#edit_section').find('option:first').remove()     
+                        for (x in data)
+                        {
+                            var sel = document.getElementById("edit_roll_no");
+                            var option = document.createElement("option");
+                            option.text = data[x];
+                            sel.add(option);
+                        }
+                    }
+                }
+            });      
+
+        }); //Display Roll No's based on which section is selected
+
+        $('#edit_roll_no').change(function(){
+          if($('#edit_roll_no option:nth-child(1)').is(":selected"))
+          {
+              $('#get_edit_student').attr("disabled",true);  
+          }
+          else{
+            $('#get_edit_student').attr("disabled",false);   
+          }
+          
+        });
         
         $('#edit_contact_form').hide()
-        $(".student_id").change(function () {
-            var student_id = $(this).val();
+        $("#get_edit_student").click(function () {
+            var edit_class = $('#edit_class').val();
+            var edit_section = $('#edit_section').val();
+            var edit_roll_no = $('#edit_roll_no').val();
+            
+            // alert(edit_roll_no)
+            // alert(edit_class)
+            // alert(edit_section)
 
             $.ajax({
                 url: '{% url "dashboard"%}',
-                dataType:"json",
+                // dataType:"json",
                 data:{
-                        'student_id': student_id,
+                        'edit_class': edit_class,
+                        'edit_section':edit_section,
+                        'edit_roll_no':edit_roll_no,
                      },
                 success: function(data) 
                 {
                     console.log(data)
                     $('#edit_contact_form').show()
+
                     var gender=data[0].fields["gender"]
                     
                     $(":text[name=edit_first_name]").val(data[0].fields["first_name"])
@@ -830,16 +959,27 @@
                     $(":text[name=edit_phone]").val(data[0].fields["contact"])
                     $(":text[name=edit_address]").val(data[0].fields["address"])
                     $(":text[name=edit_zip]").val(data[0].fields["pincode"])
-                    $(":text[name=edit_roll_no]").val(data[0].fields["roll_no"])
+                    $(":text[name=edit_roll_no_value]").val(data[0].fields["roll_no"])
                     $(":text[name=hidden_student_id]").val(data[0].pk)
                     
-                    $("#edit_class").text(data[0].fields["classes"])
-                    $("#edit_section").text(data[0].fields["section"])
+                    $("#edit_class_value").text(data[0].fields["classes"])
+                    $("#edit_section_value").text(data[0].fields["section"])
                     
                     if (gender == "M")
                         {$("#edit_male").prop('checked',true)}
                     else
-                        {$("#edit_female").prop('checked',true)}   
+                        {$("#edit_female").prop('checked',true)}
+
+                    
+                    $('#edit_section').attr("disabled",true)
+                    $('#edit_roll_no').attr("disabled",true)
+                    $('#get_edit_student').attr("disabled",true)
+
+
+                    $('#edit_section').find('option').not(':first').remove()
+                    $('#edit_roll_no').find('option').not(':first').remove()
+                    
+                    $('#edit_class option:first').attr("selected",true)
                 },
                 error:function(data)
                 {
@@ -848,6 +988,14 @@
                 }
             });
         });      //Display Student Details on the basis of Student ID for Editing
+
+        
+
+
+
+
+
+
 
         $('#class').click(function(){
           $('#section').find('option').not(':first').remove()
@@ -865,7 +1013,7 @@
                 success: function(data)
                 {
                    console.log(data)
-
+                    $('#section').attr("disabled",true);     
                     if (data.length!=0){
                         $('#section').attr("disabled",false);     
                         for (x in data)
@@ -899,6 +1047,7 @@
                 success: function(data)
                 {
                     console.log(data)
+                    $('#roll_no').attr("disabled",true);
                     if (data.length!=0){
                         $('#roll_no').attr("disabled",false);     
                         for (x in data)

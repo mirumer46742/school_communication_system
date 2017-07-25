@@ -241,16 +241,19 @@ class DashboardView(generic.TemplateView):
         context['dashboard_click']=True        
         
         data = request.GET
-        student_id = data.get('student_id')
+        edit_class = data.get('edit_class')
+        edit_section = data.get('edit_section')
+        edit_roll_no = data.get('edit_roll_no')
+
         if request.is_ajax():
 
-            obj_json = serializers.serialize('json', Student.objects.filter(id=student_id))
+            obj_json = serializers.serialize('json', Student.objects.filter(classes = edit_class,section =edit_section ,roll_no = edit_roll_no, user_id=current_user_id ))
             obj_list = json.loads(obj_json)
             json_data = json.dumps(obj_list)
 
-            # print "--------------------"
-            # print "JSON Data", json_data
-            # print "--------------------"
+            print "--------------------"
+            print "JSON Data", json_data
+            print "--------------------"
             
             return HttpResponse(json_data, content_type='application/json')
 
