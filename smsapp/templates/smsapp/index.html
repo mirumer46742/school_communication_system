@@ -18,6 +18,17 @@
 
                               <!-- Success Message -->
 
+                              {% if student_exists %}
+                                  <div class="form-group inputdata">
+                                      <label class="col-md-4 control-label"></label>  
+                                      <div class="col-md-4 inputGroupContainer"> 
+                                              <div class="alert alert-danger alert-dismissable fade in">
+                                                  <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>{{student_exists}}
+                                              </div>
+                                      </div>
+                                  </div>
+                              {% endif %}
+
                               {% if success %}
                                   <div class="form-group inputdata">
                                       <label class="col-md-4 control-label"></label>  
@@ -28,6 +39,8 @@
                                       </div>
                                   </div>
                               {% endif %}
+
+                              
                               
                               
                                 <!-- Text input for first Name-->
@@ -150,7 +163,7 @@
                                     <div class="col-md-4 selectContainer">
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="glyphicon glyphicon-copyright-mark"></i></span>
-                                    <select name="class" class="form-control selectpicker" >
+                                    <select name="class"  id="add_class" class="form-control selectpicker" >
                                       <option value=" " >Please select the Class</option>
                                       <option>12th</option>
                                       <option>11th</option>
@@ -180,7 +193,7 @@
                                     <div class="col-md-4 selectContainer">
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="glyphicon glyphicon-console"></i></span>
-                                    <select name="section" class="form-control selectpicker" >
+                                    <select name="section" id="add_section" class="form-control selectpicker" >
                                       <option value=" " >Please select the section</option>
                                       <option >A</option>
                                       <option >B</option>
@@ -199,7 +212,7 @@
                                     <div class="col-md-4 inputGroupContainer">
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="glyphicon glyphicon-registration-mark"></i></span>
-                                  <input name="roll_no" class="form-control"  type="text">
+                                  <input name="roll_no" id="add_roll_no" class="form-control"  type="text">
                                     </div>
                                   </div>
                                 </div>
@@ -285,7 +298,7 @@
                                 </div>
 
                                 <div class="col-sm-6 col-md-3" style="margin-bottom: 10px">
-                                      <button type="button" name="get_edit_student" id="get_edit_student" class="btn btn-success btn-block"> Show Students</button>
+                                      <button type="button" name="get_edit_student" id="get_edit_student" class="btn btn-success btn-block"> Show Student</button>
                                 </div>
                                     
                               </div>
@@ -495,7 +508,6 @@
                         
                     </div><!-- /.Edit_student_container -->
               </div>
-
 
               <div class="modal fade" id="bulk_upload_pane" role="dialog">
                             <div class="modal-dialog modal-offset-top">
@@ -830,8 +842,8 @@
 {%block ajax%}
                         
     <script>
-    $(document).ready(function()
-    {
+    // $(document).ready(function(){
+
         $('#section').attr("disabled",true)
         $('#roll_no').attr("disabled",true) 
         $('#edit_section').attr("disabled",true)
@@ -839,13 +851,12 @@
         $('#get_edit_student').attr("disabled",true)
 
 
-
+        // AJAX FOR STUDENT EDIT PAGE
         $('#edit_class').click(function(){
           $('#edit_section').find('option').not(':first').remove()
           $('#edit_roll_no').find('option').not(':first').remove()
 
         });     //Clear Section if different Classes selected at a time       
-
 
         $('#edit_class').change(function(){
             var select_class = $(this).val();
@@ -992,15 +1003,10 @@
         
 
 
-
-
-
-
-
+        // AJAX FOR SENDING SMS
         $('#class').click(function(){
           $('#section').find('option').not(':first').remove()
         });     //Clear Section if different Classes selected at a time       
-
 
         $('#class').change(function(){
             var select_class = $(this).val();
@@ -1027,7 +1033,6 @@
                     
                 }
             });      
-
         }); //Display Section based on which class is selected
 
         $('#section').click(function(){
@@ -1060,10 +1065,42 @@
                     }
                 }
             });      
-
         }); //Display Roll No's based on which section is selected
 
-    });
+
+
+        // AJAX FOR ADDING STUDENT
+        $("#add_roll_no").on("blur",function(){
+          var added_class = $('#add_class').val();
+          var added_section = $('#add_section').val();
+          var added_roll_no = $('#add_roll_no').val();
+          $.ajax({
+            url: "{% url 'dashboard' %}",
+            data:{
+                    'added_class':added_class,
+                    'added_section':added_section,
+                    'added_roll_no':added_roll_no,
+                    
+                },
+            success: function(data)
+            {
+              console.log(data)
+              if(data.student_taken)
+              {
+                  alert(data.student_exists);  
+                  $('#button').attr("disabled",true);
+                  $('#add_roll_no').focus();
+              }
+              else{
+                $('#button').attr("disabled",false)
+              }
+              
+            }
+          
+          });
+        });
+
+    // });
     </script>
 {%endblock%}
 

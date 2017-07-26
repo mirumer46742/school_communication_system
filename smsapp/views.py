@@ -19,6 +19,8 @@ from django.http import JsonResponse
 import json
 from django.core import serializers
 
+from django.views.decorators.csrf import csrf_exempt
+
 # Create your views here.
 
 from twilio.rest import Client
@@ -91,7 +93,6 @@ class SendView(generic.TemplateView):
                         student_list.append(std.section)
                 response_data = sorted(student_list)
                 
-
             return JsonResponse(response_data, safe=False)
 
         return self.render_to_response(context)
@@ -211,15 +212,20 @@ class BulkUploadView(generic.FormView):
             classes = row[8]
             section = row[9]
             roll_no = row[10]
-            student=Student(
+
+            context['student_taken'] = Student.objects.filter(classes = classes, section = section, roll_no = roll_no, user_id=current_user_id).exists()
+
+            if context['student_taken']:
+                continue
+            else:
+                student=Student(
                         first_name = first_name, last_name = last_name,
                         parentage = parentage, email = email, contact = contact,
                         gender = gender, address = address, pincode = pincode,
                         classes = classes, section = section,roll_no = roll_no,
                         user_id=current_user_id
                         )
-            student.save()
-        
+                student.save()
             
         messages.success(request, "Student File Uploaded Successfully", extra_tags='alert-success')
         return HttpResponseRedirect(reverse('dashboard'))
@@ -245,15 +251,32 @@ class DashboardView(generic.TemplateView):
         edit_section = data.get('edit_section')
         edit_roll_no = data.get('edit_roll_no')
 
+
+        if request.is_ajax():
+            print "GONE IN ADD DATA AJAX CALL"
+            content={}
+            classes = data.get('added_class')
+            section = data.get('added_section')
+            roll_no = data.get('added_roll_no')
+                
+            content['student_taken'] = Student.objects.filter(classes = classes, section = section, roll_no = roll_no, user_id=current_user_id).exists()
+            if content['student_taken']:
+                content['student_exists'] = "Student already exists with these details"
+                return JsonResponse(content)
+
+        
+            
         if request.is_ajax():
 
             obj_json = serializers.serialize('json', Student.objects.filter(classes = edit_class,section =edit_section ,roll_no = edit_roll_no, user_id=current_user_id ))
             obj_list = json.loads(obj_json)
             json_data = json.dumps(obj_list)
 
-            print "--------------------"
-            print "JSON Data", json_data
-            print "--------------------"
+            print "GONE IN EDIT DATA AJAX"
+
+            # print "--------------------"
+            # print "JSON Data", json_data
+            # print "--------------------"
             
             return HttpResponse(json_data, content_type='application/json')
 
@@ -265,8 +288,9 @@ class DashboardView(generic.TemplateView):
         context = {"student_list":student_list}
         
         data = request.POST
-        # print "DATA POST",data
+        print "DATA POST",data
 
+        
         if 'add_student_button' in data:
             first_name = data.get('first_name')
             last_name = data.get('last_name')
@@ -280,15 +304,20 @@ class DashboardView(generic.TemplateView):
             section = data.get('section')
             roll_no = data.get('roll_no')
 
-            student=Student(
-                        first_name = first_name, last_name = last_name,
-                        parentage = parentage, email = email, contact = contact,
-                        gender = gender, address = address, pincode = pincode,
-                        classes = classes, section = section,roll_no = roll_no,
-                        user_id=current_user_id
-                        )
-            student.save()
-            context["success"]="Student Added Succesfully"
+            context['student_taken'] = Student.objects.filter(classes = classes, section = section, roll_no = roll_no, user_id=current_user_id).exists()
+            if context['student_taken']:
+                context['student_exists'] = "Student already exists with these details"
+            
+            else:
+                student=Student(
+                            first_name = first_name, last_name = last_name,
+                            parentage = parentage, email = email, contact = contact,
+                            gender = gender, address = address, pincode = pincode,
+                            classes = classes, section = section,roll_no = roll_no,
+                            user_id=current_user_id
+                            )
+                student.save()
+                context["success"]="Student Added Succesfully"
             context["add_click"]=True
 
         elif 'edit_student_button' in data:
@@ -300,18 +329,33 @@ class DashboardView(generic.TemplateView):
             gender = data.get('edit_gender')
             address = data.get('edit_address')
             pincode = data.get('edit_zip')
-            classes = data.get('edit_class')
-            section = data.get('edit_section')
-            roll_no = data.get('edit_roll_no')
+            classes = data.get('edit_class_value')
+            section = data.get('edit_section_value')
+            roll_no = data.get('edit_roll_no_value')
             student_id=data.get('hidden_student_id')
 
-            student=Student.objects.filter(id=student_id).update(
-                        first_name = first_name, last_name = last_name,
-                        parentage = parentage, email = email, contact = contact,
-                        gender=gender, address = address, pincode = pincode,
-                        classes = classes, section = section,roll_no = roll_no,
-                        updated_date=datetime.datetime.now()
-                        )
+            context['student_exists'] = Student.objects.filter(classes = classes, section = section, roll_no = roll_no, user_id=current_user_id).exists()
+            
+            if context['student_exists']: 
+                student=Student.objects.filter(classes = classes, section = section, roll_no = roll_no, user_id=current_user_id)    
+                student.update( 
+                            first_name = first_name, last_name = last_name,
+                            parentage = parentage, email = email, contact = contact,
+                            gender=gender, address = address, pincode = pincode,
+                            classes = classes, section = section,roll_no = roll_no,
+                            updated_date=datetime.datetime.now()
+                            )
+                print "STUDENT EXISTED SO STUDENT AT THAT LOCATION UPDATED"
+            else:
+                student=Student.objects.filter(id=student_id).update(
+                            first_name = first_name, last_name = last_name,
+                            parentage = parentage, email = email, contact = contact,
+                            gender=gender, address = address, pincode = pincode,
+                            classes = classes, section = section,roll_no = roll_no,
+                            updated_date=datetime.datetime.now()
+                            )
+                print "STUDENT WAS NOT EXISTING SO UPDATED SUCCESSFULLY"
+                
             context["edit_success"]="Student Data Updated Succesfully"
             context["edit_click"]=True
         return self.render_to_response(context)
@@ -323,25 +367,25 @@ class LoginView(generic.TemplateView):
 
 		if request.user.is_authenticated():
 			current_user= request.user
-			# print "CURRENT USER ID", current_user.id
+			
 			return HttpResponseRedirect(reverse('dashboard'))
 		context = {}
 		return self.render_to_response(context)
 
 	def post(self, request, *args, **kwargs):
 		context = {"error":"Provide correct credentials"}
-		# current_user=request.user
+		
 		data = request.POST
 				
 		
 		username = data.get('username')
 		password = data.get('password')
 		print(username,password)
-		# print "USER",current_user
+		
 		user = authenticate(username=username,password=password)
 		try:
 			if user is not None:
-				# print user
+				
 				login(request,user)
 				return HttpResponseRedirect(reverse('dashboard'))
 			else:
