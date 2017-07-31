@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import models
+from django.contrib.auth.models import User
 
 # Create your models here.
 
@@ -26,27 +27,17 @@ class Student(models.Model):
 	roll_no = models.CharField(max_length = 3)
 	added_date = models.DateTimeField(auto_now = True)
 	updated_date = models.DateTimeField(auto_now = True)
+	user =models.ForeignKey(User)
+
 
 
 class Message(models.Model):
 	students = models.ManyToManyField(Student)
+	user =models.ForeignKey(User)
 	message = models.CharField(max_length = 1000)
 
 class MessageStatus(models.Model):
 	sent_status = models.BooleanField()
 	sent_date = models.DateTimeField(auto_now = True)
 	message = models.ForeignKey(Message)
-
-
-
-
-
-
-
-
-
-
-
-
-
 
