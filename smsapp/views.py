@@ -334,9 +334,9 @@ class DashboardView(generic.TemplateView):
             roll_no = data.get('edit_roll_no_value')
             student_id=data.get('hidden_student_id')
 
-            context['student_exists'] = Student.objects.filter(classes = classes, section = section, roll_no = roll_no, user_id=current_user_id).exists()
+            context['student_exist'] = Student.objects.filter(classes = classes, section = section, roll_no = roll_no, user_id=current_user_id).exists()
             
-            if context['student_exists']: 
+            if context['student_exist']: 
                 student=Student.objects.filter(classes = classes, section = section, roll_no = roll_no, user_id=current_user_id)    
                 student.update( 
                             first_name = first_name, last_name = last_name,

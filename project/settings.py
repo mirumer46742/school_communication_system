@@ -26,8 +26,7 @@ SECRET_KEY = 'jpy12h2-$l0u2xhgy&*#4^s_g#ge1-d3l(l6=+^7s+wix0zodp'
 DEBUG = True
 
 
-ALLOWED_HOSTS = ["162.243.66.242","school-communication.ainfo.io"]
-
+ALLOWED_HOSTS = ["127.0.0.1","162.243.66.242","school-communication.ainfo.io"]
 
 # Application definition
 
