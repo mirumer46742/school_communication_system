@@ -25,6 +25,7 @@ SECRET_KEY = 'jpy12h2-$l0u2xhgy&*#4^s_g#ge1-d3l(l6=+^7s+wix0zodp'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+
 ALLOWED_HOSTS = ["162.243.66.242","school-communication.ainfo.io"]
 
 
@@ -38,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'twilio'
 ]
 
 MIDDLEWARE = [
@@ -82,9 +84,15 @@ DATABASES = {
         'USER':'root',
         'PASSWORD':'cwLo5n3ToI',
         'HOST':'',
-	'PORT':'',
+	    'PORT':'',
     }
 }
+
+TWILIO_ACCOUNT_SID = "AC4aa999a61d3c558477d3a7b1a08501c0"
+TWILIO_AUTH_TOKEN = "d153321d442e8d80ebe6dd9a5156e291"
+TWILIO_NUMBER = "+12139557198"
+
+
 
 
 # Password validation
@@ -132,3 +140,4 @@ STATIC_URL = '/static/'
 
 STATIC_ROOT = "/var/www/school_communication_system/smsapp/static/"
 
+STATIC_ROOT = os.path.join(BASE_DIR,'static')
